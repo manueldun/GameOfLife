@@ -2,6 +2,9 @@ from tkinter import *
 from tkinter import ttk
 import threading
 
+"""This project is hosted on 
+https://github.com/manueldun/GameOfLife"""
+
 
 # Functions
 def draw_cells(world, canvas):
@@ -48,12 +51,12 @@ def kill_cell(event):
 
 def iterate(world, canvas):
     newIteration = []
-    # Main demonstration of iteration
     for row in range(GRID_SIZE_X):
         row = []
         for col in range(GRID_SIZE_Y):
             row.append(False)
         newIteration.append(row)
+    # Main demonstration of iteration
     for row in range(GRID_SIZE_X):
 
         for col in range(GRID_SIZE_Y):

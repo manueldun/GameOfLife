@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+import threading
 
 
 # Functions
@@ -108,13 +109,68 @@ if __name__ == "__main__":
     )
     canvas.grid(column=0, row=0)
 
-    def iterate_command():
+    button_frame = ttk.Frame(root, padding=10)
+    iterate_button = ttk.Button(button_frame, text="Iterate")
+    run_button = ttk.Button(button_frame, text="Run")
+    stop_button = ttk.Button(button_frame, text="Stop")
+    stop_button.configure(state="disabled")
+
+    world_lock = threading.Lock()
+
+    def iterate_callback():
         global world
-        world = iterate(world, canvas)
+        with world_lock:
+            world = iterate(world, canvas)
         draw_cells(world, canvas)
 
-    iterate_button = ttk.Button(frm, text="Iterate", command=iterate_command)
-    iterate_button.grid(column=0, row=1)
+    is_iterating = False
+
+    def run():
+        global is_iterating
+        if is_iterating:
+            iterate_callback()
+            thread = threading.Timer(0.5, run)
+            thread.daemon = True
+            thread.start()
+
+    is_iterating_lock = threading.Lock()
+
+    def run_callback():
+        global is_iterating
+        global run_button
+        global stop_button
+        global iterate_button
+        with is_iterating_lock:
+            run_button.configure(state="disabled")
+            stop_button.configure(state="enabled")
+            iterate_button.configure(state="disabled")
+            is_iterating = True
+        run()
+
+    def stop_callback():
+        global is_iterating
+        global run_button
+        global stop_button
+        with is_iterating_lock:
+            run_button.configure(state="enabled")
+            stop_button.configure(state="disabled")
+            iterate_button.configure(state="enabled")
+            is_iterating = False
+
+    def close_callback(event):
+        global is_iterating
+        with is_iterating_lock:
+            is_iterating = False
+
+    button_frame.grid(column=0, row=1)
+    iterate_button.grid(column=0, row=0)
+    run_button.grid(column=1, row=0)
+    stop_button.grid(column=2, row=0)
+
+    run_button.configure(command=run_callback)
+    iterate_button.configure(command=iterate_callback)
+    stop_button.configure(command=stop_callback)
+    root.bind("<Destroy>", close_callback)
 
     # events
     canvas.bind("<Button-1>", spawn_cell)

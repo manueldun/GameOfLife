@@ -128,15 +128,16 @@ if __name__ == "__main__":
 
     is_iterating = False
 
+    is_iterating_lock = threading.Lock()
     def run():
         global is_iterating
-        if is_iterating:
-            iterate_callback()
-            thread = threading.Timer(0.5, run)
-            thread.daemon = True
-            thread.start()
+        with is_iterating_lock:
+            if is_iterating:
+                iterate_callback()
+                thread = threading.Timer(0.5, run)
+                thread.daemon = True
+                thread.start()
 
-    is_iterating_lock = threading.Lock()
 
     def run_callback():
         global is_iterating

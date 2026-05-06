@@ -112,7 +112,10 @@ if __name__ == "__main__":
     )
     canvas.grid(column=0, row=0)
 
-    button_frame = ttk.Frame(root, padding=10)
+    button_frame = ttk.Frame(frm, padding=10)
+    label = ttk.Label(
+        text="Controls: left click to spawn cells, right click to kill cells."
+    )
     iterate_button = ttk.Button(button_frame, text="Iterate")
     run_button = ttk.Button(button_frame, text="Run")
     stop_button = ttk.Button(button_frame, text="Stop")
@@ -129,7 +132,7 @@ if __name__ == "__main__":
         global is_iterating
         if is_iterating:
             iterate_callback()
-            root.after(500,run)
+            root.after(500, run)
 
     def run_callback():
         global is_iterating
@@ -156,6 +159,7 @@ if __name__ == "__main__":
         is_iterating = False
 
     button_frame.grid(column=0, row=1)
+    label.grid(column=0, row=2)
     iterate_button.grid(column=0, row=0)
     run_button.grid(column=1, row=0)
     stop_button.grid(column=2, row=0)

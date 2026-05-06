@@ -10,38 +10,38 @@ https://github.com/manueldun/GameOfLife"""
 def draw_cells(world, canvas):
     canvas.create_line(1, 1, 1, GRID_SIZE_X * CELL_SIZE)
     canvas.create_line(1, 1, GRID_SIZE_Y * CELL_SIZE, 1)
-    for col in range(GRID_SIZE_Y):
-        for row in range(GRID_SIZE_X):
+    for col in range(GRID_SIZE_X):
+        for row in range(GRID_SIZE_Y):
             if world[col][row]:
                 canvas.create_rectangle(
-                    col * GRID_SIZE_X + 1,
-                    row * GRID_SIZE_Y + 1,
-                    (col + 1) * GRID_SIZE_X + 1,
-                    (row + 1) * GRID_SIZE_Y + 1,
+                    col * CELL_SIZE + 1,
+                    row * CELL_SIZE + 1,
+                    (col + 1) * CELL_SIZE + 1,
+                    (row + 1) * CELL_SIZE + 1,
                     fill="yellow",
                     outline="black",
                 )
             else:
                 canvas.create_rectangle(
-                    col * GRID_SIZE_X + 1,
-                    row * GRID_SIZE_Y + 1,
-                    (col + 1) * GRID_SIZE_X + 1,
-                    (row + 1) * GRID_SIZE_Y + 1,
+                    col * CELL_SIZE + 1,
+                    row * CELL_SIZE + 1,
+                    (col + 1) * CELL_SIZE + 1,
+                    (row + 1) * CELL_SIZE + 1,
                     fill="grey",
                     outline="black",
                 )
 
 
 def spawn_cell(event):
-    col = event.x // GRID_SIZE_X
-    row = event.y // GRID_SIZE_Y
+    col = event.x // CELL_SIZE
+    row = event.y // CELL_SIZE
     world[col][row] = True
     draw_cells(world, canvas)
 
 
 def kill_cell(event):
-    col = event.x // GRID_SIZE_X
-    row = event.y // GRID_SIZE_Y
+    col = event.x // CELL_SIZE
+    row = event.y // CELL_SIZE
     world[col][row] = False
     draw_cells(world, canvas)
 
@@ -51,56 +51,55 @@ def kill_cell(event):
 
 def iterate(world, canvas):
     newIteration = []
-    for row in range(GRID_SIZE_X):
-        row = []
-        for col in range(GRID_SIZE_Y):
-            row.append(False)
-        newIteration.append(row)
+    for col in range(GRID_SIZE_X):
+        row_world = []
+        for row in range(GRID_SIZE_Y):
+            row_world.append(False)
+        newIteration.append(row_world)
     # Main demonstration of iteration
-    for row in range(GRID_SIZE_X):
+    for col in range(GRID_SIZE_X):
 
-        for col in range(GRID_SIZE_Y):
+        for row in range(GRID_SIZE_Y):
             neighbors = 0
-            if row + 1 < GRID_SIZE_Y and world[row + 1][col]:
+            if row + 1 < GRID_SIZE_Y and world[col][row + 1]:
                 neighbors = neighbors + 1
             if (
                 row + 1 < GRID_SIZE_Y
                 and col + 1 < GRID_SIZE_X
-                and world[row + 1][col + 1]
+                and world[col + 1][row + 1]
             ):
                 neighbors = neighbors + 1
-            if col + 1 < GRID_SIZE_X and world[row][col + 1]:
+            if col + 1 < GRID_SIZE_X and world[col + 1][row]:
                 neighbors = neighbors + 1
-            if col + 1 < GRID_SIZE_X and row - 1 >= 0 and world[row - 1][col + 1]:
+            if col + 1 < GRID_SIZE_X and row - 1 >= 0 and world[col + 1][row - 1]:
                 neighbors = neighbors + 1
-            if row - 1 >= 0 and world[row - 1][col]:
+            if row - 1 >= 0 and world[col][row - 1]:
                 neighbors = neighbors + 1
-            if row - 1 >= 0 and col - 1 >= 0 and world[row - 1][col - 1]:
+            if row - 1 >= 0 and col - 1 >= 0 and world[col - 1][row - 1]:
                 neighbors = neighbors + 1
-            if col - 1 >= 0 and world[row][col - 1]:
+            if col - 1 >= 0 and world[col - 1][row]:
                 neighbors = neighbors + 1
-            if col - 1 >= 0 and row + 1 < GRID_SIZE_X and world[row + 1][col - 1]:
+            if col - 1 >= 0 and row + 1 < GRID_SIZE_Y and world[col - 1][row + 1]:
                 neighbors = neighbors + 1
 
-            if not world[row][col] and neighbors == 3:
-                newIteration[row][col] = True
-            if world[row][col] and neighbors > 3 or neighbors == 1:
-                newIteration[row][col] = False
-            if world[row][col] and neighbors == 2 or neighbors == 3:
-                newIteration[row][col] = True
+            if not world[col][row] and neighbors == 3:
+                newIteration[col][row] = True
+            if world[col][row] and neighbors > 3 or neighbors == 1:
+                newIteration[col][row] = False
+            if world[col][row] and neighbors == 2 or neighbors == 3:
+                newIteration[col][row] = True
     return newIteration
 
 
 if __name__ == "__main__":
     CELL_SIZE = 15
-    GRID_SIZE_X = 20
+    GRID_SIZE_X = 25
     GRID_SIZE_Y = 20
-    NUMBER_OF_CELLS = 30
     # setting world
     world = []
-    for col in range(GRID_SIZE_Y):
+    for col in range(GRID_SIZE_X):
         row_world = []
-        for row in range(GRID_SIZE_X):
+        for row in range(GRID_SIZE_Y):
             row_world.append(False)
         world.append(row_world)
     # Setting UI
@@ -108,7 +107,9 @@ if __name__ == "__main__":
     frm = ttk.Frame(root, padding=10)
     frm.grid()
     canvas = Canvas(
-        frm, width=GRID_SIZE_X * CELL_SIZE + 1, height=GRID_SIZE_Y * CELL_SIZE + 1
+        frm,
+        width=GRID_SIZE_X * CELL_SIZE + 1,
+        height=GRID_SIZE_Y * CELL_SIZE + 1,
     )
     canvas.grid(column=0, row=0)
 

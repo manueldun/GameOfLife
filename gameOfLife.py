@@ -118,53 +118,42 @@ if __name__ == "__main__":
     stop_button = ttk.Button(button_frame, text="Stop")
     stop_button.configure(state="disabled")
 
-    world_lock = threading.Lock()
-
     def iterate_callback():
         global world
-        with world_lock:
-            world = iterate(world, canvas)
+        world = iterate(world, canvas)
         draw_cells(world, canvas)
 
     is_iterating = False
 
-    is_iterating_lock = threading.Lock()
     def run():
         global is_iterating
-        with is_iterating_lock:
-            if is_iterating:
-                iterate_callback()
-                thread = threading.Timer(0.5, run)
-                thread.daemon = True
-                thread.start()
-
+        if is_iterating:
+            iterate_callback()
+            root.after(500,run)
 
     def run_callback():
         global is_iterating
         global run_button
         global stop_button
         global iterate_button
-        with is_iterating_lock:
-            run_button.configure(state="disabled")
-            stop_button.configure(state="enabled")
-            iterate_button.configure(state="disabled")
-            is_iterating = True
+        run_button.configure(state="disabled")
+        stop_button.configure(state="enabled")
+        iterate_button.configure(state="disabled")
+        is_iterating = True
         run()
 
     def stop_callback():
         global is_iterating
         global run_button
         global stop_button
-        with is_iterating_lock:
-            run_button.configure(state="enabled")
-            stop_button.configure(state="disabled")
-            iterate_button.configure(state="enabled")
-            is_iterating = False
+        run_button.configure(state="enabled")
+        stop_button.configure(state="disabled")
+        iterate_button.configure(state="enabled")
+        is_iterating = False
 
     def close_callback(event):
         global is_iterating
-        with is_iterating_lock:
-            is_iterating = False
+        is_iterating = False
 
     button_frame.grid(column=0, row=1)
     iterate_button.grid(column=0, row=0)
